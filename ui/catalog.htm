@@ -1,0 +1,95 @@
+<!-- Project Path Assignment : MongoDB & Webapps -->
+<!-- products.htm -->
+<!-- Nate Arkin -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Project Path Assignment : MongoDB & Webapps</title>
+    <style>
+        @media screen and (max-width: 800pt) {
+            .productContainer {
+                width: 100%;
+                float: none;
+            }
+            .productContainer img {
+                width: 400pt;
+                margin: 0 calc((100% - 400pt) / 2);
+            }
+        }
+        @media screen and (min-width: 801pt) {
+            .productContainer {
+                /* width: 400pt; */
+                width: CALC((100% - 30px) / 3);
+                float: left;
+                height: 375pt;
+                margin: 5px;
+            }
+            .productContainer img {
+                width: 300pt;
+                margin: 0 calc((100% - 320pt) / 2);
+            }
+        }
+        .productContainer .productDescription {
+            text-align: justify;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="catalogContainer">
+
+    </div>
+    <script>
+        window.onload = function () {
+            // fetch products and display them here
+            drawCatalog();
+        }
+
+        async function drawCatalog() {
+            const apiCall = await fetch('/api/getProducts')
+                .then(result => result.json())
+                .then(result => { return result })
+            if (apiCall.success) {
+                // Do the things for each product
+                apiCall.data.forEach(product => {
+                    const container = document.createElement('div');
+                    container.classList.add('productContainer');
+
+                    const image = document.createElement('img');
+                    image.src = product.productImageURL;
+                    container.appendChild(image);
+                    container.appendChild(document.createElement('br'));
+
+                    const name = document.createElement('span');
+                    name.classList.add('productTitle');
+                    name.innerText = product.productName;
+                    container.appendChild(name);
+                    container.appendChild(document.createElement('br'));
+
+                    const price = document.createElement('span');
+                    price.classList.add('productPrice');
+                    price.innerText = `$${product.productUnitPrice}`;
+                    container.appendChild(price);
+                    container.appendChild(document.createElement('br'));
+
+                    const description = document.createElement('span');
+                    description.classList.add('productDescription');
+                    description.innerText = product.productDescription;
+                    container.appendChild(description);
+
+                    document.getElementById('catalogContainer').appendChild(container);
+                })
+            } else {
+                alert(`An error has occured: \n\n ${JSON.stringify(apiCall.err)}`);
+                console.error(apiCall.err);
+            }
+        }
+    </script>
+</body>
+
+</html>
