@@ -4,11 +4,15 @@
 
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const mongo = require('mongodb')
 const client = new MongoClient('mongodb://localhost');
 const path = require('path');
 const faker = require('faker');
+const bodyParser = require('body-parser')
+
 
 const app = module.exports = express();
+app.use(bodyParser.json())
 
 // API endpoint for generating data
 app.get('/api/generateData', (req, res) => {
@@ -51,5 +55,26 @@ async function getProducts() {
     } catch (err) {
         console.error(err);
         return ({ success: false, err: err })
+    }
+}
+
+app.post('/api/updateOnHand', (req, res) => {
+    updateQtys(req.body.items).then(result => res.send(result));
+})
+
+async function updateQtys(itemList) {
+    try {
+        await client.connect()
+        const db = client.db('Arkin-WebAppProjectPath').collection('Products');
+        itemList.forEach(item => {
+            db.updateOne({ "_id": new mongo.ObjectID(item.id) }, { "$inc": { "productInventory": (item.qty * -1) } }, (err) => {
+                if (err) {
+                    throw err;
+                }
+            })
+        })
+        return { success: true }
+    } catch (err) {
+        throw err;
     }
 }

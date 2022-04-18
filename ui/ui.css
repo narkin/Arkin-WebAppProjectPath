@@ -1,0 +1,34 @@
+/* Project Path Assignment : MongoDB & Webapps */
+/* UI Style Document */
+/* Nate Arkin */
+
+@media screen and (max-width: 800pt) {
+    .productContainer {
+        width: 100%;
+        float: none;
+    }
+
+    .productContainer img {
+        width: 400pt;
+        margin: 0 calc((100% - 400pt) / 2);
+    }
+}
+
+@media screen and (min-width: 801pt) {
+    .productContainer {
+        /* width: 400pt; */
+        width: CALC((100% - 30px) / 3);
+        float: left;
+        height: 375pt;
+        margin: 5px;
+    }
+
+    .productContainer img {
+        width: 300pt;
+        margin: 0 calc((100% - 320pt) / 2);
+    }
+}
+
+.productContainer .productDescription {
+    text-align: justify;
+}
