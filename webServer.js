@@ -20,6 +20,9 @@ app.use(productsAPI);
 const authAPI = require('./modules/auth');
 app.use(authAPI);
 
+const ordersAPI = require('./modules/orders');
+app.use(ordersAPI);
+
 // Listen for TCP connections at our web server:
 app.listen(port, () => {
     console.info(`Server is listening at http://localhost:${port}/`);
