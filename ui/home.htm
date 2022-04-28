@@ -15,7 +15,8 @@
 <body>
     <button style="margin: 5px;" onclick="window.location.href = '/catalog';">Show Shop Catalog</button><br>
     <button style="margin: 5px;" onclick="window.location.href = '/cart';">Show Cart</button><br>
-    <button style="margin: 5px;" onclick="window.location.href = '/api/generateData';">Generate Fake Data</button>
+    <button style="margin: 5px;" onclick="window.location.href = '/api/generateData';">Generate Fake Data</button><br><br>
+    <button style="margin: 5px;" onclick="logout()">Logout</button>
     <script>
         window.onload = async function () {
             if (window.sessionStorage.userID) {
@@ -39,6 +40,11 @@
                 window.sessionStorage.removeItem('userID');
                 window.location.href = '/login';
             }
+        }
+
+        function logout() {
+            window.sessionStorage.clear();
+            window.location.reload();
         }
     </script>
 </body>
