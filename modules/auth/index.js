@@ -13,7 +13,6 @@ const app = module.exports = express();
 app.use(bodyParser.json())
 
 app.post('/register', (req, res) => {
-    console.log(req.body);
     registerUser(req.body.userID).then(result => res.send(result));
 })
 
@@ -36,7 +35,6 @@ async function registerUser(username) {
 }
 
 app.post('/authUser', (req, res) => {
-    console.log(req.body);
     checkUserID(req.body.userID).then(result => res.send(result));
 })
 
