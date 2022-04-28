@@ -23,10 +23,25 @@ async function recordOrder(username, orderInformation) {
         const date = new Date();
         const recordOrder = await db.insertOne({
             userID: username,
-            date: `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+            date: `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
             order: orderInformation
         })
         console.log(recordOrder)
+    } catch (err) {
+        return { success: false, err: err }
+    }
+}
+
+app.get('/api/orders/:username', (req, res) => {
+    getOrders(req.params.username).then(result => res.send(result));
+})
+
+async function getOrders(username) {
+    try {
+        await client.connect();
+        const db = client.db('Arkin-WebAppProjectPath').collection('CustomerOrders');
+        const userOrders = await db.find({ userID: username }).toArray();
+        return { success: true, data: userOrders };
     } catch (err) {
         return { success: false, err: err }
     }

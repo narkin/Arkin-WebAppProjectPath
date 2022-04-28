@@ -31,3 +31,7 @@ app.get('/cart/js', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname + '/loginregister.htm'))
 })
+
+app.get('/orders', (req, res) => {
+    res.sendFile(path.join(__dirname + '/pastOrders.htm'))
+})

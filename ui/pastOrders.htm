@@ -1,0 +1,114 @@
+<!-- Project Path Assignment : MongoDB & Webapps -->
+<!-- pastOrders.htm -->
+<!-- Nate Arkin -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Path Assignment : MongoDB & Webapps</title>
+</head>
+
+<body>
+    <button onclick="window.location.href = '/';">Return to Home</button>
+    <h2>Your Previous Orders</h2>
+    <table id="orderContainer" border="1"></table>
+    <script>
+        window.onload = async function () {
+            if (window.sessionStorage.userID) {
+                const userLogin = await fetch('authUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userID: window.sessionStorage.userID
+                    })
+                })
+                    .then(response => response.json())
+                    .then(result => { return result });
+                if (userLogin.success) {
+                    drawOrdersTable();
+                } else {
+                    window.sessionStorage.removeItem('userID');
+                    alert(userLogin.err)
+                    window.location.href = '/login';
+                }
+            } else {
+                window.sessionStorage.removeItem('userID');
+                window.location.href = '/login';
+            }
+        }
+
+        async function drawOrdersTable() {
+            const outputTable = document.getElementById('orderContainer');
+
+            const orders = await fetch('/api/orders/' + window.sessionStorage.userID)
+                .then(response => response.json())
+                .then(result => { return result })
+
+            if (orders.success) {
+                if (orders.data.length === 0) {
+                    outputTable.innerText = 'No orders found..'
+                } else {
+                    orders.data.forEach(order => {
+                        const tr = document.createElement('tr');
+                        const orderHeader = document.createElement('td');
+                        orderHeader.innerText = `${order._id}\n${order.date}`;
+                        tr.appendChild(orderHeader);
+
+                        const orderDetail = document.createElement('td');
+                        var orderTotal = 0.0;
+                        
+                        const orderDetailTable = document.createElement('table');
+                        orderDetailTable.setAttribute('border', '1');
+                        orderDetailTable.innerHTML = '<thead><td>Product Name</td><td>Unit Price</td><td>Qty Purchased</td><td>Extended Price</td></thead>';
+
+                        order.order.forEach(orderLine => {
+                            const detailLineRow = document.createElement('tr');
+
+                            const name = document.createElement('td');
+                            name.innerText = orderLine.name;
+                            detailLineRow.appendChild(name);
+
+                            const unitPrice = document.createElement('td');
+                            unitPrice.innerText = `$${orderLine.unitPrice}`;
+                            detailLineRow.appendChild(unitPrice);
+
+                            const qtyPurchased = document.createElement('td');
+                            qtyPurchased.innerText = orderLine.qtyPurchased;
+                            detailLineRow.appendChild(qtyPurchased);
+
+                            const extendedTotal = document.createElement('td');
+                            extendedTotal.innerText = `$${(orderLine.unitPrice*orderLine.qtyPurchased).toFixed(2)}`;
+                            detailLineRow.appendChild(extendedTotal)
+
+                            orderTotal += (orderLine.qtyPurchased * orderLine.unitPrice);
+
+                            orderDetailTable.appendChild(detailLineRow)
+                        })
+
+                        const orderTotalLine = document.createElement('td');
+                        orderTotalLine.colSpan = 4;
+                        orderTotalLine.style.textAlign = 'right'
+                        orderTotalLine.innerText = 'Order Total: $' + orderTotal.toFixed(2);
+                        orderDetailTable.appendChild(orderTotalLine);
+
+                        orderDetail.appendChild(orderDetailTable);
+                        tr.appendChild(orderDetail);
+
+                        outputTable.appendChild(tr);
+                    })
+                }
+
+
+
+            } else {
+                alert(JSON.stringify(orders.err))
+            }
+        }
+    </script>
+</body>
+
+</html>
