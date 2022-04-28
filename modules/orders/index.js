@@ -18,7 +18,6 @@ app.put('/api/order', (req, res) => {
 
 async function recordOrder(username, orderInformation) {
     try {
-        console.log(orderInformation);
         await client.connect();
         const db = client.db('Arkin-WebAppProjectPath').collection('CustomerOrders');
         const date = new Date();
