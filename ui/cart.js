@@ -113,6 +113,7 @@ async function checkout() {
         
         if (stockUpdate.success) {
             alert('success!')
+            window.sessionStorage.removeItem('cart');
             window.location.href = '/';
         }
     }
