@@ -2,7 +2,7 @@
 // Catalog UI JavaSctipt
 // Nate Arkin
 
-window.onload = function () {
+window.onload = async function () {
     // fetch products and display them here
 
     if (window.sessionStorage.userID) {
