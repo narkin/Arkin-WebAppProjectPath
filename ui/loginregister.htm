@@ -1,0 +1,57 @@
+<!-- Project Path Assignment : MongoDB & Webapps -->
+<!-- loginregister.htm -->
+<!-- Nate Arkin -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Path Assignment : MongoDB & Webapps</title>
+</head>
+
+<body>
+    <input type="text" name="" id="loginInput" placeholder="Login with Username"><button onclick="login()">Login</button><br>
+    <input type="text" name="" id="registerInput" placeholder="Register a Username"><button onclick="register()">Register</button>
+    <script>
+        async function login() {
+            const loginResult = await fetch('/authUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userID: document.getElementById('loginInput').value
+                })
+            })
+                .then(response => response.json())
+                .then(result => { return result })
+            if (loginResult.success) {
+                window.sessionStorage.setItem('userID', document.getElementById('loginInput').value);
+                window.location.href = '/';
+            } else {
+                alert(loginResult.err);
+            }
+        }
+
+        async function register() {
+            const registerResult = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userID: document.getElementById('registerInput').value
+                })
+            })
+                .then(response => response.json())
+                .then(result => { return result })
+            if (registerResult.success) {
+                window.sessionStorage.setItem('userID', document.getElementById('registerInput').value);
+                window.location.href = '/';
+            } else {
+                alert(registerResult.err)
+            }
+        }
+    </script>
+</body>
+
+</html>

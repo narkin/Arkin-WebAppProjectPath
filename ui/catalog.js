@@ -4,7 +4,28 @@
 
 window.onload = function () {
     // fetch products and display them here
-    drawCatalog();
+
+    if (window.sessionStorage.userID) {
+        const userLogin = await fetch('authUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userID: window.sessionStorage.userID
+            })
+        })
+            .then(response => response.json())
+            .then(result => { return result });
+        if (userLogin.success) {
+            drawCatalog();
+        } else {
+            window.sessionStorage.removeItem('userID');
+            alert(userLogin.err)
+            window.location.href = '/login';
+        }
+    } else {
+        window.sessionStorage.removeItem('userID');
+        window.location.href = '/login';
+    }
 }
 
 async function drawCatalog() {

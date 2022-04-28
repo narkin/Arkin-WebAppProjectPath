@@ -4,15 +4,43 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Path Assignment : MongoDB & Webapps</title>
 </head>
+
 <body>
     <button style="margin: 5px;" onclick="window.location.href = '/catalog';">Show Shop Catalog</button><br>
     <button style="margin: 5px;" onclick="window.location.href = '/cart';">Show Cart</button><br>
     <button style="margin: 5px;" onclick="window.location.href = '/api/generateData';">Generate Fake Data</button>
+    <script>
+        window.onload = async function () {
+            if (window.sessionStorage.userID) {
+                const userLogin = await fetch('authUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userID: window.sessionStorage.userID
+                    })
+                })
+                    .then(response => response.json())
+                    .then(result => { return result });
+                if (userLogin.success) {
+                    return 1;
+                } else {
+                    window.sessionStorage.removeItem('userID');
+                    alert(userLogin.err)
+                    window.location.href = '/login';
+                }
+            } else {
+                window.sessionStorage.removeItem('userID');
+                window.location.href = '/login';
+            }
+        }
+    </script>
 </body>
+
 </html>

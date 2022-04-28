@@ -2,8 +2,28 @@
 // Catalog UI JavaSctipt
 // Nate Arkin
 
-window.onload = function () {
-    drawCart();
+window.onload = async function () {
+    if (window.sessionStorage.userID) {
+        const userLogin = await fetch('authUser', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userID: window.sessionStorage.userID
+            })
+        })
+            .then(response => response.json())
+            .then(result => { return result });
+        if (userLogin.success) {
+            drawCart();
+        } else {
+            window.sessionStorage.removeItem('userID');
+            alert(userLogin.err)
+            window.location.href = '/login';
+        }
+    } else {
+        window.sessionStorage.removeItem('userID');
+        window.location.href = '/login';
+    }
 }
 
 async function drawCart() {
@@ -110,7 +130,7 @@ async function checkout() {
         })
             .then(result => result.json())
             .then(result => { return result })
-        
+
         if (stockUpdate.success) {
             alert('success!')
             window.sessionStorage.removeItem('cart');
