@@ -29,12 +29,18 @@ window.onload = async function () {
 }
 
 async function drawCatalog() {
+    const {data: ratings} = await fetch('/api/rating').then(response => response.json()).then(result => {return result})
+    console.log(ratings)
+
     const apiCall = await fetch('/api/getProducts')
         .then(result => result.json())
         .then(result => { return result })
     if (apiCall.success) {
         // Do the things for each product
         apiCall.data.forEach(product => {
+            const rating = ratings.filter(item => item._id === product._id);
+            console.log(rating);
+
             const container = document.createElement('div');
             container.classList.add('productContainer');
 
@@ -53,6 +59,21 @@ async function drawCatalog() {
             price.classList.add('productPrice');
             price.innerText = `$${product.productUnitPrice}`;
             container.appendChild(price);
+            container.appendChild(document.createElement('br'));
+
+            const ratingCell = document.createElement('span');
+            ratingCell.classList.add('productRating');
+            if (rating.length != 0) {
+                if ((rating[0].rating - Math.floor(rating[0].rating)) >= .5) {
+                    rating[0].rating = Math.floor(rating[0].rating) + .5;
+                } else {
+                    rating[0].rating = Math.floor(rating[0].rating)
+                }
+                ratingCell.innerText =`${rating[0].rating} Stars\n(${rating[0].count} Reviews)`;
+            } else {
+                ratingCell.innerText ='No Reviews';
+            }
+            container.appendChild(ratingCell)
             container.appendChild(document.createElement('br'));
 
             const stock = document.createElement('span');

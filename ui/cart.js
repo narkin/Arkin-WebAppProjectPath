@@ -40,6 +40,8 @@ async function drawCart() {
             const container = document.createElement('div');
             container.classList.add('productContainer');
 
+            orderRecordLine.id = product._id;
+
             const image = document.createElement('img');
             image.src = product.productImageURL;
             container.appendChild(image);

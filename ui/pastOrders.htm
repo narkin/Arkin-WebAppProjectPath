@@ -44,6 +44,12 @@
         async function drawOrdersTable() {
             const outputTable = document.getElementById('orderContainer');
 
+            const {data: ratings} = await fetch('/api/ratings', {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then(result => { return result })
+
             const orders = await fetch('/api/orders/' + window.sessionStorage.userID)
                 .then(response => response.json())
                 .then(result => { return result })
@@ -60,10 +66,10 @@
 
                         const orderDetail = document.createElement('td');
                         var orderTotal = 0.0;
-                        
+
                         const orderDetailTable = document.createElement('table');
                         orderDetailTable.setAttribute('border', '1');
-                        orderDetailTable.innerHTML = '<thead><td>Product Name</td><td>Unit Price</td><td>Qty Purchased</td><td>Extended Price</td></thead>';
+                        orderDetailTable.innerHTML = '<thead><td>Product Name</td><td>Unit Price</td><td>Qty Purchased</td><td>Extended Price</td><td>Your Rating</td></thead>';
 
                         order.order.forEach(orderLine => {
                             const detailLineRow = document.createElement('tr');
@@ -81,8 +87,38 @@
                             detailLineRow.appendChild(qtyPurchased);
 
                             const extendedTotal = document.createElement('td');
-                            extendedTotal.innerText = `$${(orderLine.unitPrice*orderLine.qtyPurchased).toFixed(2)}`;
+                            extendedTotal.innerText = `$${(orderLine.unitPrice * orderLine.qtyPurchased).toFixed(2)}`;
                             detailLineRow.appendChild(extendedTotal)
+
+
+                            // Check for existing rating
+                            const rating = ratings.filter(rating => (rating.orderId === order._id && rating.itemId === orderLine.id))
+
+                            const ratingOptionCell = document.createElement('td');
+                            const ratingOption = document.createElement('select');
+                            ratingOption.innerHTML = `<option value='1'>1</option>
+                            <option value='2'>2</option>
+                            <option value='3'>3</option>
+                            <option value='4'>4</option>
+                            <option value='5'>5</option>`;
+                            ratingOptionCell.appendChild(ratingOption);
+                            const ratingSubmitButton = document.createElement('button');
+                            ratingSubmitButton.innerText = 'Submit Review';
+                            ratingSubmitButton.addEventListener('click', function () {
+                                submitReview(order._id, orderLine.id, ratingOption.value);
+                            })
+                            if (rating.length != 0) {
+                                ratingOption.value = rating[0].rating;
+                                ratingOption.disabled = true;
+                            } else {
+                                ratingOptionCell.appendChild(ratingSubmitButton);
+                                ratingSubmitButton.disabled = true;
+                                ratingOption.value = 'na'
+                                ratingOption.addEventListener('change', function() {
+                                    ratingSubmitButton.disabled = false;
+                                })
+                            }
+                            detailLineRow.appendChild(ratingOptionCell);
 
                             orderTotal += (orderLine.qtyPurchased * orderLine.unitPrice);
 
@@ -90,7 +126,7 @@
                         })
 
                         const orderTotalLine = document.createElement('td');
-                        orderTotalLine.colSpan = 4;
+                        orderTotalLine.colSpan = 5;
                         orderTotalLine.style.textAlign = 'right'
                         orderTotalLine.innerText = 'Order Total: $' + orderTotal.toFixed(2);
                         orderDetailTable.appendChild(orderTotalLine);
@@ -101,12 +137,27 @@
                         outputTable.appendChild(tr);
                     })
                 }
-
-
-
             } else {
                 alert(JSON.stringify(orders.err))
             }
+        }
+
+        async function submitReview(order, item, rating) {
+            const submitRating = await fetch('/api/rating', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    order: order,
+                    item: item,
+                    rating: rating
+                })
+            })
+                .then(response => response.json())
+                .then(result => { return result })
+
+                if (submitRating.success) {
+                    window.location.reload();
+                }
         }
     </script>
 </body>

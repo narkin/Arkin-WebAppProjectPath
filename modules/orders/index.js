@@ -53,3 +53,48 @@ async function getOrders(username) {
         return { success: false, err: err }
     }
 }
+
+app.put('/api/rating', (req, res) => {
+    addReview(req.body.order, req.body.item, req.body.rating).then(result => res.send(result));
+})
+
+async function addReview(order, item, rating) {
+    try {
+        await client.connect();
+        const db = client.db('Arkin-WebAppProjectPath').collection('Reviews');
+        const recordRating = await db.insertOne({
+            orderId: order,
+            itemId: item,
+            rating: parseInt(rating)
+        })
+        if (recordRating.acknowledged) {
+            return { success: true }
+        } else {
+            return { success: false, err: 'db error' }
+        }
+    } catch (err) {
+        return { success: false, err: err }
+    }
+}
+
+app.get('/api/ratings', async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db('Arkin-WebAppProjectPath').collection('Reviews');
+        const ratings = await db.find({}).toArray();
+        res.send({ success: true, data: ratings })
+    } catch (err) {
+        res.send({ success: false, err: err })
+    }
+})
+
+app.get('/api/rating', async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db('Arkin-WebAppProjectPath').collection('Reviews');
+        const ratings = await db.aggregate([{'$group': {'_id': '$itemId', 'rating': {'$avg': '$rating'}, 'count': {'$sum': 1}}}]).toArray();
+        res.send({ success: true, data: ratings })
+    } catch (err) {
+        res.send({ success: false, err: err })
+    }
+})
