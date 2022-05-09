@@ -13,8 +13,14 @@ const app = module.exports = express();
 app.use(bodyParser.json())
 
 app.put('/api/order', (req, res) => {
-    recordOrder(req.body.userID, req.body.orderInformation).then(function () { res.sendStatus(418) });
-})
+    recordOrder(req.body.userID, req.body.orderInformation).then(function (result) {
+        if (result.success) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(500);
+        }
+    })
+});
 
 async function recordOrder(username, orderInformation) {
     try {
@@ -27,6 +33,7 @@ async function recordOrder(username, orderInformation) {
             order: orderInformation
         })
         console.log(recordOrder)
+        return { success: true }
     } catch (err) {
         return { success: false, err: err }
     }
